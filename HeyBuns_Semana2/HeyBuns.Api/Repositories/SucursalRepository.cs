@@ -7,9 +7,7 @@ namespace HeyBuns.Api.Repositories;
 public interface ISucursalRepository
 {
     Task<List<Sucursal>> ListarAsync();
-    Task<Sucursal?> ObtenerPorIdAsync(int id);
-    Task CrearAsync(Sucursal sucursal);
-    Task GuardarCambiosAsync();
+    Task<bool> ExisteAsync(int id);
 }
 
 public class SucursalRepository : ISucursalRepository
@@ -19,16 +17,8 @@ public class SucursalRepository : ISucursalRepository
     public SucursalRepository(AppDbContext db) => _db = db;
 
     public Task<List<Sucursal>> ListarAsync() =>
-        _db.Sucursales.OrderBy(s => s.Nombre).ToListAsync();
+        _db.Sucursales.Where(s => s.Activa).OrderBy(s => s.Nombre).ToListAsync();
 
-    public Task<Sucursal?> ObtenerPorIdAsync(int id) =>
-        _db.Sucursales.FirstOrDefaultAsync(s => s.Id == id);
-
-    public async Task CrearAsync(Sucursal sucursal)
-    {
-        _db.Sucursales.Add(sucursal);
-        await _db.SaveChangesAsync();
-    }
-
-    public Task GuardarCambiosAsync() => _db.SaveChangesAsync();
+    public Task<bool> ExisteAsync(int id) =>
+        _db.Sucursales.AnyAsync(s => s.Id == id);
 }

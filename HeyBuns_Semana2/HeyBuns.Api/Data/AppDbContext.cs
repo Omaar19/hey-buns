@@ -9,6 +9,7 @@ public class AppDbContext : DbContext
 
     public DbSet<Usuario> Usuarios => Set<Usuario>();
     public DbSet<Sucursal> Sucursales => Set<Sucursal>();
+    public DbSet<Mesa> Mesas => Set<Mesa>();
     public DbSet<Categoria> Categorias => Set<Categoria>();
     public DbSet<Producto> Productos => Set<Producto>();
     public DbSet<Pedido> Pedidos => Set<Pedido>();
@@ -23,6 +24,7 @@ public class AppDbContext : DbContext
             e.Property(u => u.PasswordHash).HasMaxLength(200).IsRequired();
             e.Property(u => u.Rol).HasMaxLength(20).IsRequired();
             e.HasIndex(u => u.Correo).IsUnique();
+            e.HasOne(u => u.Sucursal).WithMany().HasForeignKey(u => u.SucursalId).OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<Sucursal>(e =>
@@ -31,6 +33,12 @@ public class AppDbContext : DbContext
             e.Property(s => s.Direccion).HasMaxLength(200).IsRequired();
             e.Property(s => s.Telefono).HasMaxLength(20);
             e.Property(s => s.Horario).HasMaxLength(100).IsRequired();
+        });
+
+        modelBuilder.Entity<Mesa>(e =>
+        {
+            e.HasIndex(m => new { m.SucursalId, m.Numero }).IsUnique();
+            e.HasOne(m => m.Sucursal).WithMany().HasForeignKey(m => m.SucursalId).OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<Categoria>(e =>
@@ -50,11 +58,15 @@ public class AppDbContext : DbContext
 
         modelBuilder.Entity<Pedido>(e =>
         {
+            e.Property(p => p.Tipo).HasMaxLength(20).IsRequired();
+            e.Property(p => p.NombreCliente).HasMaxLength(100).IsRequired();
+            e.Property(p => p.Telefono).HasMaxLength(20);
+            e.Property(p => p.Direccion).HasMaxLength(200);
             e.Property(p => p.Estado).HasMaxLength(20).IsRequired();
             e.Property(p => p.Notas).HasMaxLength(200);
             e.Property(p => p.Total).HasColumnType("decimal(10,2)");
-            e.HasOne(p => p.Usuario).WithMany().HasForeignKey(p => p.UsuarioId).OnDelete(DeleteBehavior.Restrict);
             e.HasOne(p => p.Sucursal).WithMany().HasForeignKey(p => p.SucursalId).OnDelete(DeleteBehavior.Restrict);
+            e.HasOne(p => p.Mesa).WithMany().HasForeignKey(p => p.MesaId).OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<DetallePedido>(e =>

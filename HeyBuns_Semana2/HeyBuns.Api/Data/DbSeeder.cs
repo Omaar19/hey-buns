@@ -7,15 +7,29 @@ public static class DbSeeder
 {
     public static void Sembrar(AppDbContext db)
     {
-        if (!db.Usuarios.Any())
+        if (!db.Sucursales.Any())
         {
-            db.Usuarios.Add(new Usuario
+            var valle = new Sucursal { Nombre = "Valle Alto", Direccion = "Dirección por definir", Telefono = "6670000001", Horario = "12:00 a 22:00" };
+            var conquista = new Sucursal { Nombre = "La Conquista", Direccion = "Dirección por definir", Telefono = "6670000002", Horario = "12:00 a 22:00" };
+            db.Sucursales.AddRange(valle, conquista);
+
+            // 5 mesas por sucursal
+            for (var n = 1; n <= 5; n++)
             {
-                Nombre = "Administrador",
-                Correo = "admin@heybuns.com",
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin123!"),
-                Rol = "Admin"
-            });
+                db.Mesas.Add(new Mesa { Sucursal = valle, Numero = n });
+                db.Mesas.Add(new Mesa { Sucursal = conquista, Numero = n });
+            }
+
+            // Administrador y empleados de prueba
+            var claveAdmin = BCrypt.Net.BCrypt.HashPassword("Admin123!");
+            var claveEmpleado = BCrypt.Net.BCrypt.HashPassword("Empleado123!");
+            db.Usuarios.AddRange(
+                new Usuario { Nombre = "Administrador", Correo = "admin@heybuns.com", PasswordHash = claveAdmin, Rol = Roles.Admin },
+                new Usuario { Nombre = "Cocinero Valle Alto", Correo = "cocinero.valle@heybuns.com", PasswordHash = claveEmpleado, Rol = Roles.Cocinero, Sucursal = valle },
+                new Usuario { Nombre = "Mesero Valle Alto", Correo = "mesero.valle@heybuns.com", PasswordHash = claveEmpleado, Rol = Roles.Mesero, Sucursal = valle },
+                new Usuario { Nombre = "Cocinero La Conquista", Correo = "cocinero.conquista@heybuns.com", PasswordHash = claveEmpleado, Rol = Roles.Cocinero, Sucursal = conquista },
+                new Usuario { Nombre = "Mesero La Conquista", Correo = "mesero.conquista@heybuns.com", PasswordHash = claveEmpleado, Rol = Roles.Mesero, Sucursal = conquista }
+            );
         }
 
         if (!db.Categorias.Any())
@@ -31,14 +45,6 @@ public static class DbSeeder
                 new Producto { Categoria = hamburguesas, Nombre = "Bacon", Descripcion = "Carne de res con tocino crujiente", Precio = 109 },
                 new Producto { Categoria = bebidas, Nombre = "Refresco", Descripcion = "Refresco de 355 ml", Precio = 25 },
                 new Producto { Categoria = complementos, Nombre = "Papas", Descripcion = "Papas a la francesa", Precio = 35 }
-            );
-        }
-
-        if (!db.Sucursales.Any())
-        {
-            db.Sucursales.AddRange(
-                new Sucursal { Nombre = "Hey Buns Centro", Direccion = "Dirección por definir", Telefono = "6670000001", Horario = "12:00 a 22:00" },
-                new Sucursal { Nombre = "Hey Buns Norte", Direccion = "Dirección por definir", Telefono = "6670000002", Horario = "12:00 a 22:00" }
             );
         }
 

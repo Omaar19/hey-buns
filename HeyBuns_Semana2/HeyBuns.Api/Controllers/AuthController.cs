@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HeyBuns.Api.Controllers;
 
+// Solo para trabajadores, los clientes no inician sesión
 [ApiController]
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
@@ -11,10 +12,6 @@ public class AuthController : ControllerBase
     private readonly IAuthService _auth;
 
     public AuthController(IAuthService auth) => _auth = auth;
-
-    [HttpPost("registro")]
-    public async Task<IActionResult> Registro(RegistroDto dto) =>
-        Ok(await _auth.RegistrarAsync(dto));
 
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginDto dto) =>

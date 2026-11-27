@@ -4,9 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HeyBuns.Api.Controllers;
 
+// El menú lo puede ver cualquiera, incluso los clientes que piden sin cuenta
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
+[AllowAnonymous]
 public class CategoriasController : ControllerBase
 {
     private readonly ICategoriaService _categorias;
